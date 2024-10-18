@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { LoginDto } from './dto/auth.dto';
 import { compare } from 'bcrypt';
-import { UserService } from 'src/user/user.service';
-import { UserResponse } from 'src/user/dto';
 import { JwtService } from '@nestjs/jwt';
+import { UserService } from '../user/user.service';
+import { UserResponse } from '../user/dto';
 
 @Injectable()
 export class AuthService {
@@ -48,5 +48,28 @@ export class AuthService {
     if (!isPasswordCorrect) throw new UnauthorizedException();
     const { password, ...result } = user;
     return result;
+  }
+
+  async refreshToken(user: any) {
+    const payload = {
+      username: user.name,
+      sub: user.sub,
+    };
+
+    const generateAccessToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET_KEY,
+      expiresIn: process.env.EXPIRES_TOKEN_IN,
+    });
+
+    const generateRefreshToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_REFRESH_TOKEN_KEY,
+      expiresIn: process.env.EXPIRES_REFRESH_TOKEN_IN,
+    });
+
+    return {
+      user,
+      access_token: generateAccessToken,
+      refesh_token: generateRefreshToken,
+    };
   }
 }

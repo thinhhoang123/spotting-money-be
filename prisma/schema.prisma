@@ -14,8 +14,18 @@ datasource db {
 }
 
 model User {
-  id        Int @id @default(autoincrement())
-  email     String @unique
-  name      String
-  password  String
+  id         String             @id @default(uuid())
+  email      String             @unique
+  name       String
+  password   String
+  categories Category[]
+}
+
+model Category {
+  id String @id @default(uuid())
+  title String
+  userId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users User @relation(fields: [userId], references: [id])
 }

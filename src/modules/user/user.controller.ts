@@ -1,16 +1,16 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from 'src/auth/auth.guard';
 import { UserService } from './user.service';
+import { AuthGuard } from '../auth/guard';
 
-@ApiTags('User Services')
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Get(':id')
-  async getUserProfile(@Param('id') id: number) {
+  async getUserProfile(@Param('id') id: string) {
     return await this.userService.findById(id);
   }
 }
